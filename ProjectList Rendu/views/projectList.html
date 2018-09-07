@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ProjectList</title>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+
+</head>
+<header>
+	<div style="border-bottom: 1px solid black;">
+		<h1>Project list</h1>
+	</div>
+</header>
+<body data-spy="scroll" data-target=".navbar" data-offset="50">
+	<div id="app" class="container" style="padding-left: 10px;">
+		<div class="container" style="padding-top: 100px">
+			<div>
+				<nav class="navbar navbar-inverse">
+				  <div class="container-fluid">
+				    <div class="navbar-header">
+				      <a class="navbar-brand"></a>
+				    </div>
+				    <ul class="nav navbar-nav">
+				      <li><a class="btn btn-blueviolet btn-create" href="/views/newProject.html">Add</a></li>
+				    </ul>
+				    <form class="navbar-form navbar-left form-inline" action="/action_page.php">
+				      <div class="form-group">
+				        <input type="text" class="form-control" placeholder="Search" id="searchInput">
+				      </div>
+				    </form>
+				  </div>
+				</nav>
+			</div>
+		</div>
+	
+<div class="container" >
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th style="width: 3%;text-align: center;">#</th>
+          <th>Name</th>
+          <th>Priority</th>
+          <th style="width: 8%;text-align: center;">Starting date</th>
+          <th style="width: 8%;text-align: center;">Deadline</th>
+          <th style="width: 6%;text-align: center;">Participants</th>
+          <th style="max-width: 35%;text-align: center;">Description</th>
+          <th style="width: 8%;text-align: center;"></th>
+        </tr>
+      </thead>
+      <tbody id="proTable">
+        <tr v-for="(p,index) in projects">
+          <th scope="row" style="vertical-align: middle;text-align: center;">{{index+1}}</th>
+          <td>{{p.name}}</td>
+          <td>{{p.priority}}</td>
+          <td>{{p.starting_date}}</td>
+          <td>{{p.deadline}}</td>
+          <td>{{p.nb_of_part}}</td>
+          <td class="scrollable">
+            <div>
+              {{p.description}}
+            </div>
+          </td>
+          <td style="text-align: center; vertical-align: middle;"><button type="button" style="background-color: grey;" name="delete_btn" class="btn btn-info" v-on:click="removeProject(index)">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#app',
+	  	data: {
+			index:0,
+      		projects: [],
+      		newElement: {id:"", name:"",priority:"",starting_date:"",deadline:"",nb_of_part:"",description:""}
+		},
+		methods: {
+			addRows: function(index){
+				this.projects.splice(index + 1,0,{});
+			},
+			removeProject: function(item){
+		        this.projects.splice(item,1);
+		    },
+			loadProjects: function(){
+				fetch('/projects')
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(data);
+					this.index=this.index+1;
+					this.newElement.id=this.index;
+					for(var i=0;i<data.length;i++){
+						user=data[i];
+						this.projects.push({
+							id:this.index,
+							name:user.name,
+							priority:user.priority,
+							starting_date:user.starting_date,
+							deadline:user.deadline,
+							nb_of_part:user.nb_of_part,
+							description:user.description
+						});
+						this.newElement = {
+							id:"", 
+							name:"",
+							priority:"",
+							starting_date:"",
+							deadline:"",
+							nb_of_part:"",
+							description:""
+						};
+					}
+				})
+			}
+		},
+		beforeMount() {
+			this.loadProjects();
+      
+		}
+	});
+
+	$(document).ready(function(){
+		$("#searchInput").on("keyup", function() {
+			var value = $(this).val().toLowerCase();
+				$("#proTable tr").filter(function() {
+				$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+			});
+		});
+	});
+</script>
+
+</html>

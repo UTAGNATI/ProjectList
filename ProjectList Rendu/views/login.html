@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>	
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+</head>
+<header>
+	<div class="container-fluid">
+		<div>
+			<nav class="navbar navbar-inverse">
+			  <div class="container-fluid">
+			    <div class="navbar-header">
+			      <a class="navbar-brand" style="color: white; ">Project list</a>
+			    </div>
+			    <ul class="nav navbar-nav navbar-right">
+			      <li><a class="btn" data-toggle="modal" data-target="#SignUpModal" style="color: white; font-weight: bold;"><span class="glyphicon glyphicon-user"></span> Sign-Up</a></li>
+			      <li><a class="btn"  style=" color: white; font-weight: bold;"><span class="glyphicon glyphicon-log-in"></span> Sign-In</a></li>
+			    </ul>
+			  </div>
+			</nav>
+		</div>
+	</div>
+</header>
+<body>
+  <div id="app">
+    
+    <div class="modal fade" id="SignUpModal" tabindex="-1" role="dialog" aria-labelledby="SignUpModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="SignUpModalLabel">Register:</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="newUsername" class="col-form-label">Username:</label>
+                  <input type="text" class="form-control" id="newUsername">
+                </div>
+                <div class="form-group">
+                  <label for="newPassword" class="col-form-label">Password:</label>
+                  <input type="password" class="form-control" id="newPassword">
+                </div>
+                <div class="form-group">
+                  <label for="newPasswordVerif" class="col-form-label">Repeat password:</label>
+                  <input type="password" class="form-control" id="newPasswordVerif">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" v-on:click="signup" id="submit">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    <div class="container-fluid" style="padding-top: 200px">
+      <div class="container">
+        <p style="text-align: center;">
+          <img src="https://healthcaretechbuzz.files.wordpress.com/2013/05/logo-only.png" width="200" height="200">
+        </p>
+      </div>
+      <div class="container" style="width: 20%">
+        <form  class="form" >
+          <div>
+            <div style="height: 8px;">
+            </div>
+            <div class="form-group">
+                <input type="text" id="username" name="user_username" class="form-control" placeholder="Username">
+              </div>
+            <div class="form-group">
+                <input type="password" id="password" name="user_password" class="form-control" placeholder="Password">
+              </div>
+              <div class="button" style="margin-top: 7px; margin-bottom: 10px">
+              <button type="button" style="background-color: grey;" class="btn btn-info" v-on:click="connect" >Connect</button>
+            </div>
+            </div>
+        </form>
+      </div>
+    </div>
+        
+  </div>
+</body>
+<script>
+  var app = new Vue({
+		el: '#app',
+	  	data: {
+			    index:0,
+      		flag:-1
+		},
+		methods: {
+      connect : function() {
+        let username = document.getElementById('username').value;
+        let password = document.getElementById('password').value;
+      
+        console.log(username + ' ' + password);
+        
+        fetch('/users')
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          for(var i=0;i<data.length;i++){
+						  if(data[i].username === username && data[i].password === password) {
+                console.log('ok');
+                this.flag = 0;
+                document.location.href="/views/projectList.html";
+              }
+            else {
+              console.log('nope' + data[i].username);
+            }
+					};
+          if(this.flag === -1) {   
+            document.getElementById('username').value = 'Wrong password or unregistered username';
+          }
+        });
+      },
+      signup : function() {
+        let newUsername = document.getElementById('newUsername').value;
+        let newPassword = document.getElementById('newPassword').value;
+        let newPasswordVerif = document.getElementById('newPasswordVerif').value;
+        
+        if(newPassword === newPasswordVerif && newPassword != '' && newUsername != '') {
+          fetch('/users', {
+            method: 'POST', 
+            headers: {
+              'Accept':'application/json, text/plain, */*',
+              'Content-type':'application/json'
+            },
+            body: JSON.stringify({
+              username: newUsername, 
+              password: newPassword,
+            })
+          })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+          
+          location.reload();
+        }
+        else {
+          console.log("NOPE Please enter the same password");
+        }
+      }
+    }
+  });
+  
+  $('#SignUpModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) 
+    var recipient = button.data('whatever') 
+    var modal = $(this)
+    modal.find('.modal-title').text('Enter your information :')
+  })                 
+</script>
+</html>

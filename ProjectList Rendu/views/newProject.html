@@ -1,0 +1,124 @@
+  
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NewProject</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+</head>
+<header>
+  <div style="border-bottom: 1px solid black;">
+      <h1><center>Project List</center></h1>
+  </div>
+</header>
+<body>
+  <div id="main" class="container-fluid">
+    <div class="container" style="padding-top: 50px">
+      <form class="form">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name"  v-model="newElement.name">
+        </div>
+        
+        <div class="form-group">
+          <label for="box">Priority</label>
+          <select class="form-control" v-model="newElement.priority" id="priority">
+            <option>Low</option>
+            <option>Average</option>
+            <option>High</option>
+            <option>Urgent</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="starting-date">Starting date</label>
+          <input type="date" class="form-control" id="starting_date" v-model="newElement.starting_date">
+        </div>
+
+        <div class="form-group">
+          <label for="deadline">Deadline</label>
+          <input type="date" class="form-control" id="deadline" v-model="newElement.deadline">
+        </div>
+
+        <div class="form-group">
+          <label for="nb-of-part">Number of participants</label>
+          <input type="number" class="form-control" id="nb_of_part" v-model="newElement.nb_of_part">
+        </div>
+        
+        <div>
+          <label for="description">Description</label>
+          <textarea class="form-control" id="description" v-model="newElement.description" rows="4"></textarea>
+        </div>
+        
+        <br />
+
+        <button type="button" style="background-color: grey;" class="btn btn-info" v-on:click="addPost">Save</button>
+        <button type="button" style="background-color: grey;" class="btn btn-danger" onclick="history.back()" >Back</button>
+
+        <br />
+        <br />
+      </form>
+    </div>
+    
+  </div>
+</body>
+
+<script type="text/javascript">
+  app = new Vue({
+    el: "#main",
+    data: {
+      index:0,
+      projects: [],
+      newElement: {id:"", name:"",priority:"",starting_date:"",deadline:"",nb_of_part:"",description:""}
+    },
+
+    methods: {
+      removeProject: function(item){
+        this.projects.splice(item,1);
+      },
+      addPost(e){
+        console.log('Le projet a bien été ajouté à la liste');
+        e.preventDefault();
+
+        let name = document.getElementById('name').value;
+        let priority = document.getElementById('priority').value;
+        let starting_date = document.getElementById('starting_date').value;
+        let deadline = document.getElementById('deadline').value;
+        let nb_of_part = document.getElementById('nb_of_part').value;
+        let description = document.getElementById('description').value;
+        
+        if(name != '' && priority != '' && starting_date != '' && deadline != '' && nb_of_part != '') {
+          fetch('/projects', {
+            method: 'POST', 
+            headers: {
+              'Accept':'application/json, text/plain, */*',
+              'Content-type':'application/json'
+            },
+            body: JSON.stringify({
+              name: name, 
+              priority: priority,
+              starting_date: starting_date,
+              deadline: deadline,
+              nb_of_part: nb_of_part,
+              description: description
+            })
+          })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+          // history.back();
+          document.location.href="/views/projectList.html";
+        }
+        else {
+          console.log('You have to give some information to submit your project !');
+        }
+      }
+    }
+  });
+</script>
+
+</html>

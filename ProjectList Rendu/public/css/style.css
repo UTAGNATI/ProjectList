@@ -1,0 +1,29 @@
+h1 {
+	text-align: center;
+	padding: 5px;
+	padding-top: 12px;
+	color: black;
+	border-top: 1px solid black;
+}
+
+th {
+	resize:none;
+}
+
+thead {
+	padding: 5px;
+	border:1px solid;
+	border-collapse: collapse;
+}
+
+#form_case {
+	border-radius: 5px;
+	border: 1px solid black;
+	margin-bottom: 5px; 
+	background-color: black;
+}
+
+td.scrollable {
+	width: 500px;
+	max-height: 150px;
+}
